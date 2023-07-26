@@ -1,0 +1,162 @@
+#:kivy 1.0
+#:set img_size 112
+
+# use Factory to create dynamic class, so we can just define the help popup in the kv file and not the py file
+#:import Factory kivy.factory.Factory
+
+# display timer in seconds
+#:import math math
+
+<Dice>:
+    dice_size: min(dp(img_size), app.root.height * 0.20, app.root.width * 0.2) # for s9 dp(x) is x*3 and height is width * 2
+    size: (self.dice_size, self.dice_size)
+    size_hint: (None, None)
+    on_press: self.click_dice()
+    pos: self.pos
+    border: (0, 0, 0, 0)
+
+<Container>:
+    BoxLayout:
+        orientation: 'vertical'
+        size: root.width, root.height
+
+        # black scoreboard area along the top
+        Label:
+            id: score_time
+            text: "Score: {}  Time remaining: {}".format(root.score, math.ceil(root.time_remaining))
+            font_size: 50
+            size_hint_y: None
+
+        # green area where dice bounce around at the bottom
+        RelativeLayout:
+            id: dice_zone
+            background_color:  (53/255, 101/255, 77/255, 1)
+            canvas.before:
+                Color:
+                    rgba: self.background_color
+                Rectangle:
+                    size: self.size
+
+<PopupLabel@Label>:
+    size_hint: None, None
+    size: self.texture_size
+    pos_hint: {'center_x': 0.5}
+    padding: [20, 10]
+
+<PopupBoxLayout@BoxLayout>:
+    size_hint: None, None
+    height: self.minimum_height
+    width: self.minimum_width
+    pos_hint: {'center_x': 0.5}
+
+<PopupButton@Button>:
+    size_hint: None, None
+    size: self.texture_size
+    padding: [20, 10]
+
+# Label with pink background for debugging layouts
+<BackgroundLabel@PopupLabel>:
+    background_color:  (201/255, 26/255, 97/255, 1)
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+# BoxLayout with blue background for debugging layouts
+<BackgroundLayout@PopupBoxLayout>:
+    background_color:  (26/255, 99/255, 201/255, 1)
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
+            
+<NewGamePopup>:
+    title: 'Game over!'
+    auto_dismiss: False
+    size_hint: None, None
+    width: newgame_contents.width + dp(15)
+    height: newgame_contents.height + dp(60)
+    PopupBoxLayout:
+        id: newgame_contents
+        orientation: 'vertical'
+        PopupLabel:
+            id: label
+            text: "It's easy! Just click the dice and have some fun!"
+            # after first game: "Congratulations! You scored <score>"
+        PopupLabel:
+            id: high_scores
+            text: app.root.high_score_table_text # "{}".format(app.root.high_score_table_text)
+            size_hint_y: None
+        PopupBoxLayout:
+            id: new_high_score
+            orientation: 'vertical'
+            PopupLabel:
+                text: "You got a new high score!"
+            PopupLabel:
+                text: "Enter your name:"
+            PopupBoxLayout:
+                orientation: 'horizontal'
+                pos_hint: {'center_x': 0.5}
+                TextInput:
+                    id: player_name
+                    size_hint: None, None
+                    height: self.line_height * 2
+                    width: dp(150)
+                    multiline: False
+                    on_text_validate: app.root.add_new_high_score()
+                    focus: True
+                PopupButton:
+                    text: 'OK'
+                    padding_x: 10
+                    on_release: app.root.add_new_high_score()
+                
+        PopupLabel:
+            id: bait
+            text: "Think you can get a higher score?"
+        PopupBoxLayout:
+            id: buttons
+            orientation: 'horizontal'
+            PopupButton:
+                id: play
+                text: 'Play again'
+                on_release:
+                    app.root.add_new_high_score() # in case they type their name but don't press enter or click the button
+                    root.dismiss()
+                    app.root.new_game()
+            PopupButton:
+                id: exit
+                text: "I'm done"
+                on_release: app.stop()
+            PopupBoxLayout:
+                id: options
+                orientation: 'vertical'
+                width: self.minimum_width + dp(10) # add a margin
+                ClickableImage:
+                    cog_size: dp(30)
+                    size_hint: (None, None)
+                    size: (self.cog_size, self.cog_size)
+                    pos_hint: {'right': 1}
+                    source: "img/cog_30.png"
+
+<OptionsPopup>:
+    title: 'Secret options!'
+    auto_dismiss: False
+    size_hint: None, None
+    width: buttons.width + dp(30)
+    height: buttons.height + dp(80)
+    PopupBoxLayout:
+        id: buttons
+        orientation: 'horizontal'
+        PopupButton:
+            id: reset_button
+            text: 'Reset high scores'
+            on_release: 
+                app.root.reset_high_scores()
+                root.dismiss()
+        PopupButton:
+            text: "Cancel"
+            on_release: root.dismiss()
