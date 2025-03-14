@@ -1,5 +1,3 @@
-''' Proof of concept Kivy application to roll a dice | AG 23/2/23 '''
-    
 # interface
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -32,10 +30,19 @@ import os
 import json
 from operator import itemgetter
 
-# sound effectss
+# for pyinstaller packaging
+import sys
+from kivy.resources import resource_add_path
+from os import path
+
+# sound effects
 play_background_sound = True # TODO: move this to a config file, add config interface
-sound_click = SoundLoader.load('audio/smw_coin.wav')
-sound_background = SoundLoader.load('audio/dice_chase.mp3')
+# __file__ is used in the lines below to ensure files are always picked up relative to the script location, even when sys._MEIPASS is in play
+sound_click_path = path.abspath(path.join(path.dirname(__file__), 'audio', 'smw_coin.wav'))
+sound_background_path = path.abspath(path.join(path.dirname(__file__), 'audio', 'dice_chase.mp3'))
+sound_click = SoundLoader.load(sound_click_path)
+sound_background = SoundLoader.load(sound_background_path)
+
 # mp3 - good compression but anecdotally may not work on Android (0.4 Mb)
 # ogg - good compression but doesn't work on Desktop (0.4 Mb)
 # flac - works and has around 75% compression (2.6 Mb)
@@ -398,6 +405,7 @@ class DiceApp(App):
     # and grant it additional functionality (e.g. updating periodically)
     def build(self):
         game = Container()
+        self.icon = path.abspath(path.join(path.dirname(__file__), 'img', 'dice_chase.ico'))
         return game
     
     # when keyboard shows to enter high score, prevent it covering the window
@@ -408,4 +416,9 @@ class DiceApp(App):
         sound_background.play()
 
 if __name__ == '__main__':
+
+    # for pyinstaller packaging - allows elements in .kv file to locate the img directory
+    if hasattr(sys, '_MEIPASS'):
+        resource_add_path(sys._MEIPASS)
+
     DiceApp().run()

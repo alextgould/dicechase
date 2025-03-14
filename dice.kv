@@ -111,7 +111,7 @@
                     focus: True
                 PopupButton:
                     text: 'OK'
-                    padding_x: 10
+                    padding: [10, 0] # left-right padding of 10, top-bottom padding of 0
                     on_release: app.root.add_new_high_score()
                 
         PopupLabel:
