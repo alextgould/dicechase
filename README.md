@@ -23,7 +23,7 @@ For users on Windows (x64) you can download [build.zip](build.zip) which contain
 
 If you want to package it yourself (or you're not using Windows), you can use [PyInstaller](https://pyinstaller.org/en/stable/index.html) to bundle a Python application and its dependencies into a single package. This can be done on Windows, macOS and Linux, but must be done on the same type of platform you plan to run it on.
 
-You can run [build.bat](build.bat) if you're using Windows. I've also created (but not yet tested) [build.sh](build.sh) for Linux/macOS users. These call pyinstaller which will create a build working folder and .spec file along with a dist folder which contains the dicechase.exe file as well as dependencies in the _internal folder.
+Once you've installed Pyinstaller (using `pip install -U pyinstaller`), you can run [build.bat](build.bat) if you're using Windows. I've also created (but not yet tested) [build.sh](build.sh) for Linux/macOS users. These call pyinstaller which will create a build working folder and .spec file along with a dist folder which contains the dicechase.exe file as well as dependencies in the _internal folder.
 
 # Packaging as an Android or iPad App
 
